@@ -1,0 +1,131 @@
+{% extends based_template_name %}
+
+{% block title %}{{object.name}}{% endblock title %}
+
+{% block page_title %}
+    <!-- <div class="container">
+        <h1 class="text-left border-bottom pb-2 mt-3 mb-4">{{ object.name }}</h1>
+    </div> -->
+{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="mb-4">
+            <h1>{{ object.name }}</h1>
+            <p>{{ object.description }}</p>
+        </div>
+        
+        <div>
+            <h2>Paints in this genre</h2>
+            <div class="d-flex flex-wrap" >  
+                {% for paint in genre.paints.all %}
+                    <div class="col-3 mb-5 mcard-container">
+                        <div class="mcard">
+                            <img data-enlargeable class="card-img-top zoomable" src="{{ paint.paint.url }}" alt="Card image cap">
+                            <div class="content">
+                                <div>
+                                    <p>{{ paint.name }}</p> 
+                                    {% if request.user.is_authenticated %}
+                                        <p class="mbtn">
+                                            {% if paint in request.user.profile.favorite_paints.all %}
+                                                <i class="fa fa-heart" data-id="{{ paint.id }}"></i>
+                                            {% else %}
+                                                <i class="fa fa-heart-o" data-id="{{ paint.id }}"></i>
+                                            {% endif %}
+                                        </p>    
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p>by <a href="{% url 'painter' slug=paint.painter.slug %}"><b>{{ paint.painter.name }}</b></a></p> 
+                                    {% if paint.genre is not None %}
+                                        <p><a href="{% url 'genre' slug=paint.genre.slug %}">#{{ paint.genre.name }}</a></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h5>No paints was currently added.</h5>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h2>Artists who painted in this genre</h2>
+            <div class="d-flex flex-wrap" >                    
+                {% for painter in genre.painters.all %}
+                    <div class="col-3 mb-5 mcard-container">
+                        <div class="mcard">
+                            <a href="{% url 'painter' slug=painter.slug %}"><img class="card-img-top" src="{{ painter.photo.url }}" alt="Card image cap"></a>
+                            <div class="content">
+                                <div>
+                                    <p><a href="{% url 'painter' slug=painter.slug %}">{{ painter.name}}</a></p> 
+                                    {% if request.user.is_authenticated %}
+                                        <p class="mbtn">
+                                            {% if painter in request.user.profile.favorite_painters.all %}
+                                                <i class="fa fa-heart" data-painter-id="{{ painter.id }}"></i>
+                                            {% else %}
+                                                <i class="fa fa-heart-o" data-painter-id="{{ painter.id }}"></i>
+                                            {% endif %}
+                                        </p>    
+                                    {% endif %}
+                                </div>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h5>There is no painters</h5>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $('.content .fa').click(function(event) {
+            const onClass = 'fa-heart';
+            const offClass = 'fa-heart-o';
+            let url;
+
+            const classList = event.target.classList;
+            const paintId = event.target.dataset.paintId;
+            const painterId = event.target.dataset.painterId;
+
+            const removeUrl = painterId ? "{% url 'remove_favorite_painter' %}" : "{% url 'remove_favorite_paint' %}";
+            const addUrl = painterId ? "{% url 'add_favorite_painter' %}" : "{% url 'add_favorite_paint' %}";
+            const data = painterId ? { painter_id: painterId } : { paint_id: paintId };
+
+            const id = painterId || paintId;
+
+            if (classList.contains(onClass)) {
+                url = removeUrl;
+                event.target.classList.remove(onClass);
+                event.target.classList.add(offClass);
+            } else if (classList.contains(offClass)) {
+                url = addUrl;
+                event.target.classList.remove(offClass);
+                event.target.classList.add(onClass);
+            }
+
+            console.log('url', url);
+            if (url && id) {
+                $.ajax({
+                    url: url,
+                    data: data,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (!data.success) {
+                            alert("You can't do this");
+                            return;
+                        }
+                    },
+                });
+            }
+        });
+    </script>
+{% endblock %}

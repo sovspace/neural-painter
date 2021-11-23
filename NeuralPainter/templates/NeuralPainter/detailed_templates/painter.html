@@ -1,0 +1,108 @@
+{% extends based_template_name %}
+
+{% block title %}{{object.name}}{% endblock title %}
+
+{% block page_title %}
+    <!-- <div class="container">
+        <h1 class="text-left border-bottom border-info pb-2 mt-3 mb-4">{{ object.name }}</h1>
+    </div> -->
+{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-6">
+                <img src="{{ object.photo.url }}" style="width: 100%;" alt="Card image cap">
+            </div>
+
+            <div class="col-6">
+                <div class="mb-4">
+                    <h1 class="mb-0">{{ object.name }}</h1>
+                    <p style="font-size: 14px;" class="ml-2">{{ object.birth_date }} - {{ object.death_date }}</p>        
+                </div>
+                <p>{{ object.biography }}</p>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Paintings by {{ object.name }}</h2>
+        <div class="d-flex flex-wrap" >  
+            {% for paint in object.paints.all %}
+                <div class="col-3 mb-5 mcard-container">
+                    <div class="mcard">
+                        <img data-enlargeable class="card-img-top zoomable" src="{{ paint.paint.url }}" alt="Card image cap">
+                        <div class="content">
+                            <div>
+                                <p>{{ paint.name }}</p> 
+                                {% if request.user.is_authenticated %}
+                                    <p class="mbtn">
+                                        {% if paint in request.user.profile.favorite_paints.all %}
+                                            <i class="fa fa-heart" data-id="{{ paint.id }}"></i>
+                                        {% else %}
+                                            <i class="fa fa-heart-o" data-id="{{ paint.id }}"></i>
+                                        {% endif %}
+                                    </p>    
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p>by <a href="{% url 'painter' slug=paint.painter.slug %}"><b>{{ paint.painter.name }}</b></a></p> 
+                                {% if paint.genre is not None %}
+                                    <p><a href="{% url 'genre' slug=paint.genre.slug %}">#{{ paint.genre.name }}</a></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h5>No paints was currently added.</h5>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        const getRemoveFavUrl = () => {
+            return "{% url 'remove_favorite_paint' %}";
+        };
+
+        const getAddFavUrl = () => {
+            return "{% url 'add_favorite_paint' %}";
+        }
+
+        $('.content .fa').click(function(event) {
+            const onClass = 'fa-heart';
+            const offClass = 'fa-heart-o';
+            let url;
+
+            const classList = event.target.classList;
+            const id = event.target.dataset.id;
+
+            if (classList.contains(onClass)) {
+                url = getRemoveFavUrl();
+                event.target.classList.remove(onClass);
+                event.target.classList.add(offClass);
+            } else if (classList.contains(offClass)) {
+                url = getAddFavUrl();
+                event.target.classList.remove(offClass);
+                event.target.classList.add(onClass);
+            }
+
+            if (url && id) {
+                $.ajax({
+                    url: url,
+                    data: { paint_id: id },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (!data.success) {
+                            alert("You can't do this");
+                            return;
+                        }
+                    },
+                });
+            }
+        });
+    </script>
+{% endblock %}

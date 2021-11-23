@@ -1,0 +1,65 @@
+{% extends 'NeuralPainter/user_templates/user_base.html' %}
+
+{% block title %}Your photos{% endblock title %}
+
+
+{% block page_title %}
+    <!-- <div class="container">
+        <h1 class="text-left border-bottom pb-2 mt-3 mb-4">Your photos</h1>
+    </div> -->
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="d-flex justify-content-between px-3 pt-4">
+            <div></div>
+            <div class="checker active mbtn">
+                <a href="{% url 'add_photo' %}">
+                    <i class="fa fa-plus"></i>
+                    <span>add</span>
+                </a>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap pt-4" >                    
+            {% for photo in object_list%}
+                <div class="col-3 mb-5 mcard-container">
+                    <div class="mcard">
+                        <img data-enlargeable class="card-img-top zoomable" src="{{ photo.photo.url }}" alt="Card image cap">
+                        <div class="content">
+                            <div>
+                                <p><a>{{ photo.name }}</a></p> 
+                                <p class="mbtn"><i class="fa fa-trash" data-id="{{ photo.id }}" onclick="deletePhoto(event)"></i></p>    
+                            </div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h5>There is no photos</h5>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        const deletePhoto = (event) => {
+            const id = event.target.dataset.id;
+            if (id) {
+                $(`.content *[data-id="${id}"]`).closest('.mcard-container').remove();
+                $.ajax({
+                    url: '{% url "delete_photo" %}',
+                    data: {deleted_photo_id: id},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (!data.success) {
+                            alert("You can't do this");
+                        }
+                    }
+                });
+            }
+        };
+  </script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends based_template_name %}
+
+{% block title %}Genres{% endblock title %}
+
+{% block page_title %}
+    <!-- <div class="container">
+        <h1 class="text-left border-bottom pb-2 mt-3 mb-4">Genres</h1>
+    </div> -->
+{% endblock %}
+
+
+{% block content %}
+
+    <div id="paint_container" class="container">
+        {% if request.user.is_authenticated %}
+            <div class="d-flex justify-content-between px-3 pt-4">
+                <div></div>
+                <div class="checker active mbtn">
+                    <a href="{% url 'add_genre' %}">
+                        <i class="fa fa-plus"></i>
+                        <span>add</span>
+                    </a>
+                </div>
+            </div>
+        {% endif %}  
+        <div class="d-flex flex-wrap pt-4" >     
+            {% for genre in object_list%}
+                <div class="col-4 mb-5 mcard-container">
+                    <div class="mcard">
+                        <a href="{% url 'genre' slug=genre.slug %}"><img class="card-img-top" src="{{ genre.paints.first.paint.url }}" alt="Card image cap"></a>
+                        <div class="content">
+                            <div>
+                                <p><a href="{% url 'genre' slug=genre.slug %}">#{{ genre.name }}</a></p> 
+                            </div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h5>There is no paints</h5>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

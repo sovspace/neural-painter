@@ -1,0 +1,121 @@
+{% extends based_template_name %}
+
+{% block title %}Painters{% endblock title %}
+
+{% block page_title %}
+{% endblock %}
+
+{% load static %}
+<!-- <link rel="stylesheet" href="{% static 'css/favorite_button.css' %}"> -->
+
+{% block content %}
+    <div class="container">
+        {% if request.user.is_authenticated %}
+            <div class="d-flex justify-content-between px-3 pt-4">
+                <div>
+                    <span id="showAll" class="mbtn checker active" onclick="showAll()">all</span>
+                    <span id='showFavorite' class="mbtn checker" onclick="showFavorite()">favorite</span>
+                </div>
+                <div class="checker active mbtn">
+                    <a href="{% url 'add_painter' %}">
+                        <i class="fa fa-plus"></i>
+                        <span>add</span>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div class="d-flex flex-wrap pt-4" >                    
+            {% for painter in object_list%}
+                <div class="col-3 mb-5 mcard-container">
+                    <div class="mcard">
+                        <a href="{% url 'painter' slug=painter.slug %}"><img class="card-img-top" src="{{ painter.photo.url }}" alt="Card image cap"></a>
+                        <div class="content">
+                            <div>
+                                <p><a href="{% url 'painter' slug=painter.slug %}">{{ painter.name}}</a></p> 
+                                {% if request.user.is_authenticated %}
+                                    <p class="mbtn">
+                                        {% if painter in request.user.profile.favorite_painters.all %}
+                                            <i class="fa fa-heart" data-id="{{ painter.id }}"></i>
+                                        {% else %}
+                                            <i class="fa fa-heart-o" data-id="{{ painter.id }}"></i>
+                                        {% endif %}
+                                    </p>    
+                                {% endif %}
+                            </div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h5>There is no painters</h5>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        const getRemoveFavUrl = () => {
+            return "{% url 'remove_favorite_painter' %}";
+        };
+
+        const getAddFavUrl = () => {
+            return "{% url 'add_favorite_painter' %}";
+        }
+
+        $('.content .fa').click(function(event) {
+            const onClass = 'fa-heart';
+            const offClass = 'fa-heart-o';
+            let url;
+
+            const classList = event.target.classList;
+            const id = event.target.dataset.id;
+
+            if (classList.contains(onClass)) {
+                url = getRemoveFavUrl();
+                event.target.classList.remove(onClass);
+                event.target.classList.add(offClass);
+            } else if (classList.contains(offClass)) {
+                url = getAddFavUrl();
+                event.target.classList.remove(offClass);
+                event.target.classList.add(onClass);
+            }
+
+            if (url && id) {
+                $.ajax({
+                    url: url,
+                    data: { painter_id: id },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (!data.success) {
+                            alert("You can't do this");
+                            return;
+                        }
+                    },
+                });
+            }
+
+            update();
+        });
+
+        let onlyFavorite = false;
+        const update = () => {
+            $('.mcard-container').each(function(index, el) {
+                if (onlyFavorite && el.querySelector('.fa-heart-o')) {
+                    el.style.display = 'none';
+                } else {
+                    el.style.display = 'block';
+                }
+            });
+
+            onlyFavorite ? $('#showAll').removeClass('active') : $('#showAll').addClass('active')
+            onlyFavorite ? $('#showFavorite').addClass('active') : $('#showFavorite').removeClass('active')
+        };
+
+        const showAll = () => { onlyFavorite = false; update(); };
+        const showFavorite = () => { onlyFavorite = true; update(); }
+
+  </script>
+{% endblock %}
+
+

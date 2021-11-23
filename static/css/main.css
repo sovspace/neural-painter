@@ -1,0 +1,120 @@
+:root {
+    --danger: #FF5959;
+    --red: #FF5959;
+}
+
+.nav-item {
+    margin-right: 48px;
+}
+.navbar {
+    background-color: #3D3D3D;
+}
+.navbar .container a {
+    color: #fff;
+}
+
+.navbar .active {
+    text-decoration: underline;
+    text-decoration-color: #cecece;
+}
+
+.btn {
+    border-radius: 20px;
+}
+
+/* paints page */
+a { 
+    color: inherit; 
+    text-decoration: none;
+} 
+
+a:hover {
+    text-decoration:none; 
+    color: inherit;
+    cursor:pointer;  
+}
+
+.mcard {
+    position: relative;
+}
+
+.mcard img {
+    object-fit: cover;
+}
+
+.mcard .content {
+    position: absolute;
+    bottom: 0;
+    background: rgb(0, 0, 0); 
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    width: 100%;
+    padding: 12px 8px;
+}
+
+.mcard .content > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mcard p {
+    margin: 0;
+}
+
+.mcard .content > div:last-child {
+    font-size: 12px;
+}
+
+.card-img-top {
+    aspect-ratio: 3/4;
+}
+
+.checker {
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid #000;
+    border-radius: 20px;
+    background-color: #fff;
+    color: #424242;
+}
+.checker.active {
+    background-color: #424242;
+    color: #fff;
+}
+
+/* forms */
+.form-container {
+    background: linear-gradient(117.02deg, rgba(236, 236, 236, 0.1) -20%, #ECECEC 140.72%);
+    border-radius: 50px;
+    backdrop-filter: blur(20px);
+    padding: 40px 80px 80px 80px;
+}
+
+.form-control,
+span.select2-selection.select2-selection--single {
+    border-radius: 20px;
+}
+
+.top-icon {
+    margin-top: 2rem;
+    margin-left: 7rem;
+    margin-bottom: 0.7rem;
+}
+
+.zoomable {
+    cursor: zoom-in;
+}
+
+.mbtn {
+    transition: all 0.15s;
+    cursor: pointer;
+}
+
+    .mbtn:hover {
+        filter: brightness(85%);
+    }
+
+    .mbtn:active {
+        filter: brightness(65%);
+    }
